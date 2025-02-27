@@ -15,33 +15,21 @@ if not GEMINI_API_KEY:
 # Initialize Gemini 1.5 Flash AI
 gemini = GoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=GEMINI_API_KEY)
 
-# Streamlit UI
+# Streamlit UI Configuration
 st.set_page_config(page_title="AgriGPT", page_icon="🌱", layout="wide")
 
-st.title("🌱 AgriGPT - Your Smart Agriculture Assistant")
-st.write("Ask anything about farming, crops, or agriculture in your preferred language.")
+st.title("🌱 AgriGPT - Logical & Smart Agriculture Assistant")
+st.write("Ask about farming, crops, or agriculture, and get well-reasoned, structured, and logical responses.")
 
 # **Language Selection**
 lang_options = {
     "Auto (Detect Language)": "auto",
-    "English": "en",
-    "Hindi (हिंदी)": "hi",
-    "Kannada (ಕನ್ನಡ)": "kn",
-    "Tamil (தமிழ்)": "ta",
-    "Telugu (తెలుగు)": "te",
-    "Marathi (मराठी)": "mr",
-    "Gujarati (ગુજરાતી)": "gu",
-    "Malayalam (മലയാളം)": "ml",
-    "Punjabi (ਪੰਜਾਬੀ)": "pa",
-    "Bengali (বাংলা)": "bn",
-    "Urdu (اردو)": "ur",
-    "Spanish (Español)": "es",
-    "French (Français)": "fr",
-    "German (Deutsch)": "de",
-    "Chinese (中文)": "zh",
-    "Arabic (العربية)": "ar",
-    "Portuguese (Português)": "pt",
-    "Russian (Русский)": "ru",
+    "English": "en", "Hindi (हिंदी)": "hi", "Kannada (ಕನ್ನಡ)": "kn",
+    "Tamil (தமிழ்)": "ta", "Telugu (తెలుగు)": "te", "Marathi (मराठी)": "mr",
+    "Gujarati (ગુજરાતી)": "gu", "Malayalam (മലയാളം)": "ml", "Punjabi (ਪੰਜਾਬੀ)": "pa",
+    "Bengali (বাংলা)": "bn", "Urdu (اردو)": "ur", "Spanish (Español)": "es",
+    "French (Français)": "fr", "German (Deutsch)": "de", "Chinese (中文)": "zh",
+    "Arabic (العربية)": "ar", "Portuguese (Português)": "pt", "Russian (Русский)": "ru"
 }
 selected_lang = st.selectbox("Choose your language:", list(lang_options.keys()))
 
@@ -50,7 +38,7 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 # **User Input**
-query = st.text_input("Enter your query:")
+query = st.text_input("Enter your question:")
 
 if st.button("Ask"):
     if query:
@@ -68,33 +56,40 @@ if st.button("Ask"):
         else:
             response_lang = lang_options[selected_lang]
 
-        # **Keep Memory to Last 5 Messages**
+        # **Limit Memory to Last 5 Messages**
         history = "\n".join(st.session_state.chat_history[-5:])
 
-        # **Refined Prompt with Smart Adaptation**
+        # **Logical Reasoning & Thoughtful Processing**
         prompt = f"""
-        You are **AgriGPT**, an intelligent, multilingual agricultural assistant. Your goal is to provide natural, structured, and precise answers.
-        
-        - Respond in **{response_lang}**, ensuring clarity and a conversational yet professional tone.  
-        - **Prioritize Gemini’s reasoning** while using context **only when necessary**.  
-        - Keep responses **structured, concise, and to the point**.  
-        - Adjust detail level **based on question complexity** (quick for simple queries, detailed for complex ones).  
-        - If relevant, use **bullet points, steps, and key takeaways** to enhance readability.  
-        - Maintain a **natural and engaging conversation** while being informative.  
+        You are **AgriGPT**, an intelligent, professional, and logical agricultural assistant.  
+        Your goal is to provide well-reasoned, structured, and logically sound answers.  
+        You **do not generate random answers**—instead, you **analyze the question**, apply reasoning, and give a **precise yet justified** response.
 
-        *Recent Conversation Context:*  
+        ### **How You Should Respond:**
+        - **Think before answering.**  
+        - **Break down complex topics** step by step.  
+        - **Justify why a particular answer is correct.**  
+        - **Do not assert things blindly**—explain logically.  
+        - **Acknowledge uncertainty when needed**, instead of making up responses.  
+
+        ### **Response Structuring Rules:**
+        - Start with **a direct, well-reasoned answer**.  
+        - Use **logical steps, structured points, or headings** to explain.  
+        - **If relevant, guide the user to think critically.**  
+        - **Do not include unnecessary details**—stay on point.  
+
+        ### **Previous Conversations Context:**
         {history}
 
-        *User Query (Language: {response_lang}):*  
+        ### **User Query (Language: {response_lang}):**  
         {query}
-        
+
         {context}
 
-        *Response Format:*  
-        - **Start with a direct answer**.  
-        - **Use bullet points, headings, and structured flow** for readability.  
-        - **Only provide details when necessary**.  
-        - **Keep it natural, engaging, and professional**.  
+        ### **Response Output Guidelines:**
+        - **Direct, logically justified answer**.  
+        - **Structured breakdown if needed**.  
+        - **Intelligent guidance** rather than just providing an answer.  
         """
 
         # **Generate Response**
@@ -116,4 +111,4 @@ if st.button("Ask"):
 
 # Footer
 st.markdown("---")
-st.caption("🤖 Powered by Gemini 1.5 Flash & Smart Agricultural Knowledge")
+st.caption("🤖 Powered by Gemini 1.5 Flash & Logical Agricultural Knowledge")
