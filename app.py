@@ -1,12 +1,4 @@
-import os
-import streamlit as st
-from dotenv import load_dotenv
-from retriever import retriever  
-from langchain_google_genai import GoogleGenerativeAI  
 
-# Load environment variables
-load_dotenv()
-GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if not GEMINI_API_KEY:
     raise ValueError("Google API Key is missing. Set it in a .env file or as an environment variable.")
