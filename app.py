@@ -67,6 +67,12 @@ lang_options = {
 }
 selected_lang = st.selectbox("Choose your language:", list(lang_options.keys()))
 
+# **Text Structuring Mode Selection**
+structure_mode = st.selectbox(
+    "Choose text structuring mode:",
+    ["Bullet Points", "Step-by-Step Instructions", "Tabular Format", "Detailed Paragraphs"]
+)
+
 # **User Input**
 query = st.text_input("Enter your question:")
 
@@ -94,10 +100,11 @@ if st.button("Ask"):
         - **Do not assert things blindly**—explain logically.  
         - **Acknowledge uncertainty when needed**, instead of making up responses.  
 
-        ### **Response Structuring Rules:**
-        - Always provide answers in **bullet points** or a **step-by-step format**.  
-        - Keep responses **short when needed** and **detailed when necessary**.  
-        - Respond intelligently even to **greetings and unprofessional queries**.  
+        ### **Response Structuring Mode: {structure_mode}**
+        - If **Bullet Points**, present in clear, concise points.
+        - If **Step-by-Step Instructions**, outline the process logically.
+        - If **Tabular Format**, use tables for structured comparisons.
+        - If **Detailed Paragraphs**, provide an in-depth explanation.
 
         ### **Additional Information Based on User's Location:**
         - 📍 **Location:** {city}  
@@ -109,7 +116,7 @@ if st.button("Ask"):
 
         ### **Response Output Guidelines:**
         - **Direct, logically justified answer**.  
-        - **Structured bullet points or step-by-step breakdown**.  
+        - **Formatted according to chosen structuring mode**.  
         - **Adapt response length based on query complexity**.  
         - **If query is unprofessional, reply intelligently without engaging**.  
         """
