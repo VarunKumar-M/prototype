@@ -1,7 +1,6 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-from retriever import retriever  
 from langchain_google_genai import GoogleGenerativeAI  
 from langdetect import detect
 import requests
@@ -73,11 +72,6 @@ query = st.text_input("Enter your question:")
 
 if st.button("Ask"):
     if query:
-        retrieved_text = retriever.retrieve_relevant_text(query)
-
-        # **Use context only if it's relevant**
-        context = retrieved_text if retrieved_text and len(retrieved_text.split()) > 5 else ""
-
         # **Detect or Set Language**
         if lang_options[selected_lang] == "auto":
             try:
@@ -107,8 +101,6 @@ if st.button("Ask"):
 
         ### **User Query (Language: {response_lang}):**  
         {query}
-
-        {context}
 
         ### **Response Output Guidelines:**
         - **Direct, logically justified answer**.  
