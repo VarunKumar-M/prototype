@@ -15,7 +15,7 @@ if not GEMINI_API_KEY:
 # Initialize Gemini 1.5 Flash AI
 gemini = GoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=GEMINI_API_KEY)
 
-# Streamlit UI Setup
+# Streamlit UI
 st.set_page_config(page_title="AgriGPT", page_icon="🌱", layout="wide")
 
 st.title("🌱 AgriGPT - Your Multilingual Agriculture Expert")
@@ -50,16 +50,16 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 # **User Input**
-query = st.text_input("Enter your question:")
+query = st.text_input("Enter your query:")
 
 if st.button("Ask"):
     if query:
         retrieved_text = retriever.retrieve_relevant_text(query)
 
-        # **Ensure Precise Context Usage**
+        # **Abstract Context Use (No Explicit Mention of Dataset)**
         context = retrieved_text if retrieved_text and len(retrieved_text.split()) > 5 else ""
 
-        # **Detect or Assign Response Language**
+        # **Determine Response Language**
         if lang_options[selected_lang] == "auto":
             try:
                 response_lang = detect(query)
@@ -68,34 +68,33 @@ if st.button("Ask"):
         else:
             response_lang = lang_options[selected_lang]
 
-        # **Retrieve Last 5 Conversations**
+        # **Keep Memory to Last 5 Messages**
         history = "\n".join(st.session_state.chat_history[-5:])
 
-        # **Multilingual Prompt with Professional Formatting**
+        # **Dynamic Precision-Based Prompt**
         prompt = f"""
-        You are **AgriGPT**, an advanced multilingual agricultural assistant providing **precise, structured, and highly professional responses**.
-        
-        **Key Guidelines:**
-        - Respond in **{response_lang}** naturally and engagingly.
-        - Analyze the question **precisely** and provide **clear, factual, and structured answers**.
-        - Use **recent conversations (last 5) for coherence**.
-        - Avoid mentioning datasets; act as an **agriculture expert**.
+        You are **AgriGPT**, a professional multilingual agricultural assistant. 
+        - Answer **precisely** when short responses are enough.
+        - Provide **detailed explanations** when the question requires it.
+        - Respond in **{response_lang}**, ensuring clarity and engagement.
+        - Use **previous 5 interactions** for coherence.
+        - Never mention datasets; act as a human-like assistant.
 
-        **Recent Conversation Context:**  
+        *Recent Conversation for Context:*  
         {history}
 
-        **User Query (Language: {response_lang}):**  
+        *User Query (Language: {response_lang}):*  
         {query}
         
         {context}
 
-        **Response Formatting Guidelines:**
-        - **Use headings, bullet points, and clear outlines**.
-        - **Break down complex topics into steps or categories**.
-        - **Highlight key takeaways with bold text**.
-        - **Ensure structured, easy-to-read, and professional insights**.
+        *Guidelines for Response Formatting:*
+        - **Use headings, bullet points, and outlines** when needed.
+        - **Summarize if the question is straightforward**.
+        - **Provide step-by-step details when complexity requires it**.
+        - **Highlight key insights with bold text**.
 
-        Provide the response in **{response_lang}**, ensuring clarity, accuracy, and professionalism.
+        Generate the response in **{response_lang}**, keeping it **clear, well-structured, and professional**.
         """
 
         # **Generate Response**
@@ -117,4 +116,4 @@ if st.button("Ask"):
 
 # Footer
 st.markdown("---")
-st.caption("🤖 Powered by Google Gemini 1.5 Flash & Advanced Agricultural Knowledge")
+st.caption("🤖 Powered by AgriGPT")
