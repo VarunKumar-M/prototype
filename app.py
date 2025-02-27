@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from retriever import retriever  
 from langchain_google_genai import GoogleGenerativeAI  
 from langdetect import detect
+import requests
 
 # Load environment variables
 load_dotenv()
@@ -18,8 +19,42 @@ gemini = GoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=GEMINI_API_
 # Streamlit UI Configuration
 st.set_page_config(page_title="AgriGPT", page_icon="🌱", layout="wide")
 
-st.title("🌱 AgriGPT - Logical & Smart Agriculture Assistant")
-st.write("Ask about farming, crops, or agriculture, and get well-reasoned, structured, and logical responses.")
+st.title("🌱 AgriGPT - Smart Agriculture Assistant")
+st.write("Get farming insights, soil conditions, temperature, and more.")
+
+# **Location, Soil & Temperature Data**
+def get_location():
+    try:
+        res = requests.get("https://ipinfo.io/json").json()
+        city = res.get("city", "Unknown")
+        loc = res.get("loc", "0,0").split(",")
+        return city, float(loc[0]), float(loc[1])
+    except:
+        return "Unknown", 0, 0
+
+def get_temperature(lat, lon):
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+    try:
+        res = requests.get(url).json()
+        return res["current_weather"]["temperature"]
+    except:
+        return "N/A"
+
+def get_soil_info(lat, lon):
+    url = f"https://rest.soilgrids.org/query?lon={lon}&lat={lat}"
+    try:
+        res = requests.get(url).json()
+        soil_type = res["properties"]["classification"]["dominant"].get("WRB", "Unknown Soil Type")
+        return soil_type
+    except:
+        return "Data not available"
+
+# Get user location, soil type, and temperature
+city, lat, lon = get_location()
+temperature = get_temperature(lat, lon)
+soil_type = get_soil_info(lat, lon)
+
+st.markdown(f"📍 **Location:** {city}  \n🌡 **Temperature:** {temperature}°C  \n🌱 **Soil Type:** {soil_type}")
 
 # **Language Selection**
 lang_options = {
@@ -32,10 +67,6 @@ lang_options = {
     "Arabic (العربية)": "ar", "Portuguese (Português)": "pt", "Russian (Русский)": "ru"
 }
 selected_lang = st.selectbox("Choose your language:", list(lang_options.keys()))
-
-# **Memory Limited to Last 5 Conversations**
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
 
 # **User Input**
 query = st.text_input("Enter your question:")
@@ -56,9 +87,6 @@ if st.button("Ask"):
         else:
             response_lang = lang_options[selected_lang]
 
-        # **Limit Memory to Last 5 Messages**
-        history = "\n".join(st.session_state.chat_history[-5:])
-
         # **Logical Reasoning & Thoughtful Processing**
         prompt = f"""
         You are **AgriGPT**, an intelligent, professional, and logical agricultural assistant.  
@@ -72,14 +100,10 @@ if st.button("Ask"):
         - **Do not assert things blindly**—explain logically.  
         - **Acknowledge uncertainty when needed**, instead of making up responses.  
 
-        ### **Response Structuring Rules:**
-        - Start with **a direct, well-reasoned answer**.  
-        - Use **logical steps, structured points, or headings** to explain.  
-        - **If relevant, guide the user to think critically.**  
-        - **Do not include unnecessary details**—stay on point.  
-
-        ### **Previous Conversations Context:**
-        {history}
+        ### **Additional Information Based on User's Location:**
+        - 📍 **Location:** {city}  
+        - 🌡 **Temperature:** {temperature}°C  
+        - 🌱 **Soil Type:** {soil_type}  
 
         ### **User Query (Language: {response_lang}):**  
         {query}
@@ -99,10 +123,6 @@ if st.button("Ask"):
             st.markdown("### 🎓 AgriGPT Response:")
             st.markdown(response.strip())
 
-            # **Update Chat History (Limit to Last 5 Messages)**
-            st.session_state.chat_history.append(f"User ({response_lang}): {query}\nAgriGPT ({response_lang}): {response.strip()}")
-            st.session_state.chat_history = st.session_state.chat_history[-5:]
-
         else:
             st.error("Unable to generate a response at the moment.")
 
@@ -111,4 +131,4 @@ if st.button("Ask"):
 
 # Footer
 st.markdown("---")
-st.caption("🤖 Powered by Gemini 1.5 Flash & Logical Agricultural Knowledge")
+st.caption("🤖 Powered by Gemini 1.5 Flash, FAO SoilGrids, Open-Meteo, & OpenStreetMap")
