@@ -15,7 +15,7 @@ if not GEMINI_API_KEY:
 # Initialize Gemini 1.5 Flash AI
 gemini = GoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=GEMINI_API_KEY)
 
-# Streamlit UI
+# Streamlit UI Setup
 st.set_page_config(page_title="AgriGPT", page_icon="🌱", layout="wide")
 
 st.title("🌱 AgriGPT - Your Multilingual Agriculture Expert")
@@ -50,16 +50,16 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 # **User Input**
-query = st.text_input("Enter your query:")
+query = st.text_input("Enter your question:")
 
 if st.button("Ask"):
     if query:
         retrieved_text = retriever.retrieve_relevant_text(query)
 
-        # **Abstract Context Use (No Explicit Mention of Dataset)**
+        # **Ensure Precise Context Usage**
         context = retrieved_text if retrieved_text and len(retrieved_text.split()) > 5 else ""
 
-        # **Determine Response Language**
+        # **Detect or Assign Response Language**
         if lang_options[selected_lang] == "auto":
             try:
                 response_lang = detect(query)
@@ -68,32 +68,34 @@ if st.button("Ask"):
         else:
             response_lang = lang_options[selected_lang]
 
-        # **Keep Memory to Last 5 Messages**
+        # **Retrieve Last 5 Conversations**
         history = "\n".join(st.session_state.chat_history[-5:])
 
-        # **Multilingual Prompt with Structured Response Formatting**
+        # **Multilingual Prompt with Professional Formatting**
         prompt = f"""
-        You are **AgriGPT**, a professional multilingual agricultural assistant providing insightful, structured, and natural responses.
-        - Offer **clear, accurate, and practical advice** related to agriculture.
-        - Respond in **{response_lang}**, ensuring a **natural and engaging tone**.
-        - Use **previous 5 interactions** for coherence.
-        - Avoid mentioning datasets; act as an expert assistant.
+        You are **AgriGPT**, an advanced multilingual agricultural assistant providing **precise, structured, and highly professional responses**.
+        
+        **Key Guidelines:**
+        - Respond in **{response_lang}** naturally and engagingly.
+        - Analyze the question **precisely** and provide **clear, factual, and structured answers**.
+        - Use **recent conversations (last 5) for coherence**.
+        - Avoid mentioning datasets; act as an **agriculture expert**.
 
-        *Recent Conversation for Context:*  
+        **Recent Conversation Context:**  
         {history}
 
-        *User Query (Language: {response_lang}):*  
+        **User Query (Language: {response_lang}):**  
         {query}
         
         {context}
 
-        *Guidelines for Response Formatting:*
-        - **Use headings, bullet points, and clear outlines** for readability.
+        **Response Formatting Guidelines:**
+        - **Use headings, bullet points, and clear outlines**.
         - **Break down complex topics into steps or categories**.
         - **Highlight key takeaways with bold text**.
-        - **Ensure structured and engaging insights**.
+        - **Ensure structured, easy-to-read, and professional insights**.
 
-        Provide the response in **{response_lang}**, keeping it **well-structured, informative, and professional**.
+        Provide the response in **{response_lang}**, ensuring clarity, accuracy, and professionalism.
         """
 
         # **Generate Response**
