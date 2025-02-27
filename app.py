@@ -14,41 +14,70 @@ if not GEMINI_API_KEY:
 # Initialize Gemini 1.5 Flash AI
 gemini = GoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=GEMINI_API_KEY)
 
-# Streamlit UI
+# Streamlit UI Configuration
 st.set_page_config(page_title="AgriGPT", page_icon="🌱", layout="wide")
 
-st.title("🌱 AgriGPT - Your Agriculture Chatbot")
-st.write("Ask anything about agriculture, farming, or crop management.")
+# App Title
+st.title("🌱 AgriGPT - Your Smart Agriculture Assistant")
+st.write("Talk to me about farming, crops, or anything related to agriculture!")
 
-# User input
-query = st.text_input("Enter your question:")
+# Store Chat History for Realistic Flow
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+# User Input
+query = st.text_input("Ask me anything:")
 
 if st.button("Ask"):
     if query:
-        # Construct Gemini AI prompt
+        # Retrieve relevant context
+        retrieved_text = retriever.retrieve_relevant_text(query)
+        context = retrieved_text if retrieved_text and len(retrieved_text.split()) > 5 else ""
+
+        # Maintain Chat History for Conversational Flow
+        history = "\n".join(st.session_state.chat_history[-15:])  # Stores last 15 exchanges
+
+        # Construct Prompt for AI
         prompt = f"""
-        You are a friendly and knowledgeable agricultural assistant. Respond in a natural, engaging, and conversational tone.
-        
-        *User Question:*  
+        You are a *friendly, knowledgeable agricultural assistant* who speaks *just like a real human*.
+        - *Remember past conversations* so replies feel natural.
+        - *Sound engaging*, as if talking to a friend.
+        - *Use context* intelligently, never repeating information unnecessarily.
+
+        **Conversation So Far:**  
+        {history}
+
+        **User's Question:**  
         {query}
         
-        *Guidelines for Response:*
-        - Keep it conversational and engaging, like ChatGPT.
-        - Answer naturally without over-explaining unless asked.
-        - Be concise but helpful, avoiding robotic or overly formal tones.
+        {context}
+
+        **How You Should Answer:**
+        - Speak *naturally, like a human* (not robotic).
+        - If it's a follow-up, *connect it to past answers*.
+        - Be *concise yet engaging* – *don't over-explain* unless asked.
+        - If something is unclear, *ask the user for clarification*.
+        - If no relevant info is found, *give a thoughtful, general answer*.
+
+        Keep your tone *warm, friendly, and intelligent* – like a real expert in agriculture.
         """
 
-        # Generate response using Gemini 1.5 Flash
+        # Generate Response
         response = gemini.invoke(prompt)
 
         if response:
-            st.write(response)
+            st.write("### 🤖 AgriGPT says:")
+            st.write(response.strip())
+
+            # Save Conversation History
+            st.session_state.chat_history.append(f"User: {query}\nAgriGPT: {response.strip()}")
+
         else:
-            st.error("Failed to generate a response.")
+            st.error("Oops! I couldn't generate a response. Try again.")
 
     else:
-        st.warning("Please enter a question.")
+        st.warning("Type something first!")
 
 # Footer
 st.markdown("---")
-st.caption("🤖 Powered by Google Gemini 1.5 Flash")
+st.caption("🤖 Powered by Google Gemini 1.5 Flash & Local Agricultural Knowledge")
