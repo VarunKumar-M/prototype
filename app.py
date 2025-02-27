@@ -21,7 +21,7 @@ st.set_page_config(page_title="AgriGPT", page_icon="🌱", layout="wide")
 st.title("🌱 AgriGPT - Your Multilingual Agriculture Expert")
 st.write("Ask anything about agriculture, farming, or crop management in your preferred language!")
 
-# **Language Selection (Including Kannada, Tamil, Telugu, and More!)**
+# **Language Selection**
 lang_options = {
     "Auto (Detect Language)": "auto",
     "English": "en",
@@ -71,9 +71,9 @@ if st.button("Ask"):
         # **Keep Memory to Last 5 Messages**
         history = "\n".join(st.session_state.chat_history[-5:])
 
-        # **Multilingual Prompt for Natural, Expert Responses**
+        # **Multilingual Prompt with Structured Response Formatting**
         prompt = f"""
-        You are a **multilingual agricultural expert** providing **professional, insightful, and natural** responses.
+        You are a **multilingual agricultural expert** providing **well-structured, professional, and insightful responses**.
         - Offer **concise yet authoritative** guidance.
         - Respond in **{response_lang}**, maintaining a natural, conversational style.
         - Use **prior exchanges (last 5 messages) for coherence**.
@@ -87,22 +87,21 @@ if st.button("Ask"):
         
         {context}
 
-        *Guidelines for Response:*
-        - **Never mention external datasets or sources**—present information **naturally as expert knowledge**.
-        - **Ensure clarity, accuracy, and professionalism**.
-        - If additional clarification is needed, **ask the user subtly in their language**.
-        - Use **structured insights** for credibility.
-        - Respond in **{response_lang}**.
+        *Guidelines for Response Formatting:*
+        - **Use headings, bullet points, and clear outlines** for readability.
+        - **Break down complex topics into steps or categories**.
+        - **Highlight key takeaways with bold text**.
+        - **Use structured insights** for credibility.
 
-        Provide the response in **{response_lang}**, ensuring it is **natural, engaging, and professional**.
+        Provide the response in **{response_lang}**, ensuring it is **structured, easy to read, and professional**.
         """
 
         # **Generate Response**
         response = gemini.invoke(prompt)
 
         if response:
-            st.write("### 🎓 AgriGPT Response:")
-            st.write(response.strip())
+            st.markdown("### 🎓 AgriGPT Response:")
+            st.markdown(response.strip())
 
             # **Update Chat History (Limit to Last 5 Messages)**
             st.session_state.chat_history.append(f"User ({response_lang}): {query}\nAgriGPT ({response_lang}): {response.strip()}")
