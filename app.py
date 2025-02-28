@@ -1,7 +1,6 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-from retriever import retriever  
 from langchain_google_genai import GoogleGenerativeAI  
 from langdetect import detect
 import requests
@@ -68,16 +67,17 @@ lang_options = {
 }
 selected_lang = st.selectbox("Choose your language:", list(lang_options.keys()))
 
+# **Text Structuring Mode Selection**
+structure_mode = st.selectbox(
+    "Choose text structuring mode:",
+    ["Bullet Points", "Step-by-Step Instructions", "Tabular Format", "Detailed Paragraphs"]
+)
+
 # **User Input**
 query = st.text_input("Enter your question:")
 
 if st.button("Ask"):
     if query:
-        retrieved_text = retriever.retrieve_relevant_text(query)
-
-        # **Use context only if it's relevant**
-        context = retrieved_text if retrieved_text and len(retrieved_text.split()) > 5 else ""
-
         # **Detect or Set Language**
         if lang_options[selected_lang] == "auto":
             try:
@@ -100,6 +100,12 @@ if st.button("Ask"):
         - **Do not assert things blindly**—explain logically.  
         - **Acknowledge uncertainty when needed**, instead of making up responses.  
 
+        ### **Response Structuring Mode: {structure_mode}**
+        - If **Bullet Points**, present in clear, concise points.
+        - If **Step-by-Step Instructions**, outline the process logically.
+        - If **Tabular Format**, use tables for structured comparisons.
+        - If **Detailed Paragraphs**, provide an in-depth explanation.
+
         ### **Additional Information Based on User's Location:**
         - 📍 **Location:** {city}  
         - 🌡 **Temperature:** {temperature}°C  
@@ -108,12 +114,11 @@ if st.button("Ask"):
         ### **User Query (Language: {response_lang}):**  
         {query}
 
-        {context}
-
         ### **Response Output Guidelines:**
         - **Direct, logically justified answer**.  
-        - **Structured breakdown if needed**.  
-        - **Intelligent guidance** rather than just providing an answer.  
+        - **Formatted according to chosen structuring mode**.  
+        - **Adapt response length based on query complexity**.  
+        - **If query is unprofessional, reply intelligently without engaging**.  
         """
 
         # **Generate Response**
